@@ -1,24 +1,12 @@
 # SISOP-3-2026-IT-124
 
-<p align="center">
-  <b>Modul 3 Sistem Operasi 2026</b><br>
-  Socket Programming, Multithreading, System V IPC, Shared Memory, Message Queue, dan Mutex
-</p>
+* **Nama**  : Ndaru Satria Tama
+* **NRP**   : 5027251124
+* **Kelas** : C
 
 ---
 
-## Identitas
-
-| Field | Isi |
-|---|---|
-| Nama | Ndaru Satria Tama |
-| NRP | 5027251124 |
-| Kelas | IT-124 |
-| Repository | SISOP-3-2026-IT-124 |
-
----
-
-# 1. Struktur Repository
+## 1. Struktur Repository
 
 ```text
 .
@@ -26,7 +14,6 @@
 ├── soal1
 │   ├── navi.c
 │   ├── protocol.c
-│   ├── protocol.h
 │   └── wired.c
 └── soal2
     ├── arena.h
@@ -35,92 +22,61 @@
     └── orion.c
 ```
 
-Keterangan singkat:
-
-| Folder | Isi |
-|---|---|
-| `soal1` | Program client-server The Wired menggunakan socket dan pthread |
-| `soal2` | Program Battle of Eterion menggunakan System V IPC |
+Struktur repository dibuat sederhana agar setiap soal berada pada folder masing-masing. Pada Soal 1, file pendukung yang digunakan hanya `protocol.c`. Pada Soal 2, konfigurasi struktur data IPC diletakkan di `arena.h`.
 
 ---
 
-# 2. Pendahuluan
+## 2. Pendahuluan
 
-Pada modul ini dibuat dua program utama yang berhubungan dengan konsep komunikasi antarproses dan sinkronisasi pada Sistem Operasi.
+Pada Modul 3 Sistem Operasi 2026 ini, program yang dibuat berfokus pada komunikasi antarproses, sinkronisasi, socket programming, dan penggunaan IPC.
 
-Soal pertama berfokus pada komunikasi client-server menggunakan socket TCP. Server dapat menangani beberapa client secara bersamaan dengan pthread. Selain user biasa, terdapat admin khusus yang dapat mengecek user aktif, uptime server, dan melakukan emergency shutdown.
+Secara umum:
 
-Soal kedua berfokus pada komunikasi IPC menggunakan System V Message Queue dan Shared Memory. Program dibuat dalam bentuk game terminal bernama Battle of Eterion. Client bernama `eternal` berkomunikasi dengan server bernama `orion`. Data player disimpan secara persistent dan akses data bersama dilindungi dengan mutex.
+* **Soal 1** membuat sistem client-server bernama **The Wired** menggunakan socket TCP dan pthread.
+* **Soal 2** membuat game terminal bernama **Battle of Eterion** menggunakan Message Queue, Shared Memory, dan mutex.
 
-Tujuan utama pengerjaan:
-
-* memahami socket programming
-* memahami multithreading dengan pthread
-* memahami System V IPC
-* memahami shared memory dan message queue
-* memahami sinkronisasi data menggunakan mutex
-* membuat error handling agar program lebih aman saat diuji
+Program juga dilengkapi error handling untuk beberapa kondisi, seperti client dijalankan tanpa server, username duplikat, password salah, akun aktif di session lain, gold tidak cukup, cooldown battle, dan server IPC belum berjalan.
 
 ---
 
 # 3. Reporting Soal 1
 
-## 3.1 Deskripsi Soal
+## 3.1 Deskripsi
 
-Soal 1 membuat sistem komunikasi bernama **The Wired**.
+Soal 1 mengimplementasikan sistem komunikasi **The Wired**. Sistem ini terdiri dari server `wired` dan client `navi`.
 
-Program terdiri dari:
+Server `wired` menerima banyak client menggunakan socket TCP. Setiap client ditangani oleh thread berbeda sehingga komunikasi dapat berjalan secara bersamaan. Client biasa dapat mengirim pesan, lalu pesan tersebut dibroadcast ke client lain.
 
-* `wired.c` sebagai server
-* `navi.c` sebagai client
-* `protocol.c` dan `protocol.h` sebagai helper komunikasi
+Terdapat user khusus bernama **The Knights** yang berperan sebagai admin. Admin harus login menggunakan password `protocol7`. Setelah berhasil login, admin dapat melihat user aktif, melihat uptime server, melakukan emergency shutdown, dan disconnect.
 
-Fitur yang dibuat:
+Fitur utama Soal 1:
 
-1. Client dapat terhubung ke server.
-2. Identity atau username harus unik.
-3. Jika username sudah digunakan, client diminta memasukkan nama lain.
-4. Pesan dari satu user dapat dikirim ke user lain melalui server.
-5. Admin khusus bernama `The Knights` dapat login menggunakan password `protocol7`.
-6. Admin dapat mengecek user aktif.
-7. Admin dapat mengecek uptime server.
-8. Admin dapat melakukan emergency shutdown.
-9. Aktivitas server dicatat ke `history.log`.
-
-Konsep yang digunakan:
-
-* TCP socket
-* pthread
-* mutex
-* file logging
+1. Server menerima banyak client.
+2. Client memasukkan identity saat masuk.
+3. Identity client harus unik.
+4. Pesan user dibroadcast ke user lain.
+5. Admin login sebagai `The Knights`.
+6. Admin memiliki menu khusus.
+7. Aktivitas server dicatat ke `history.log`.
+8. Error handling untuk server mati, username kosong, username duplikat, password admin salah, dan command admin tidak valid.
 
 ---
 
 ## 3.2 File yang Digunakan
 
-Pada Soal 1, program utama yang dijalankan adalah `wired.c` sebagai server dan `navi.c` sebagai client.
-
-| Kategori | File | Fungsi |
-|---|---|---|
-| Program utama | `wired.c` | Server The Wired yang menerima koneksi client, menjalankan thread, broadcast chat, admin command, dan logging |
-| Program utama | `navi.c` | Client NAVI yang terhubung ke server, mengirim input user, dan menerima pesan dari server |
-| File pendukung protocol | `protocol.h` / `protocol.c` | Pasangan header dan implementasi helper untuk konfigurasi serta fungsi kirim/terima pesan socket |
-
-Catatan: `protocol.h` dan `protocol.c` bukan dua program terpisah yang dijalankan. Keduanya hanya dipakai sebagai file pendukung protocol agar `wired.c` dan `navi.c` lebih rapi.
+| File | Fungsi |
+|---|---|
+| `wired.c` | Server utama The Wired |
+| `navi.c` | Client NAVI |
+| `protocol.c` | Helper komunikasi socket |
 
 ---
 
-## 3.3 Kode Lengkap Soal 1
-
-Kode pada Soal 1 dipisahkan menjadi program utama dan file pendukung protocol. Program utama yang dijalankan adalah `wired.c` dan `navi.c`, sedangkan `protocol.h` / `protocol.c` berfungsi sebagai helper agar komunikasi socket tidak ditulis berulang.
+## 3.3 Kode Lengkap
 
 ### 3.3.1 `wired.c`
 
-<details>
-<summary><b>soal1/wired.c</b></summary>
-
 ```c
-#include "protocol.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -133,6 +89,22 @@ Kode pada Soal 1 dipisahkan menjadi program utama dan file pendukung protocol. P
 #include <sys/socket.h>
 #include <time.h>
 #include <unistd.h>
+#include <stddef.h>
+#include <sys/types.h>
+
+#define SERVER_IP "127.0.0.1"
+#define SERVER_PORT 4242
+#define BACKLOG 32
+#define MAX_NAME 64
+#define MAX_MSG 1024
+#define MAX_CLIENTS 64
+#define ADMIN_NAME "The Knights"
+#define ADMIN_PASSWORD "protocol7"
+
+ssize_t send_all(int fd, const void *buf, size_t len);
+int send_line(int fd, const char *line);
+ssize_t recv_line(int fd, char *buf, size_t cap);
+void trim_newline(char *s);
 
 typedef struct {
     int fd;
@@ -441,15 +413,9 @@ int main(void) {
 }
 ```
 
-</details>
-
 ### 3.3.2 `navi.c`
 
-<details>
-<summary><b>soal1/navi.c</b></summary>
-
 ```c
-#include "protocol.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -460,6 +426,18 @@ int main(void) {
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <stddef.h>
+#include <sys/types.h>
+
+#define SERVER_IP "127.0.0.1"
+#define SERVER_PORT 4242
+#define MAX_NAME 64
+#define MAX_MSG 1024
+
+ssize_t send_all(int fd, const void *buf, size_t len);
+int send_line(int fd, const char *line);
+ssize_t recv_line(int fd, char *buf, size_t cap);
+void trim_newline(char *s);
 
 static volatile sig_atomic_t running = 1;
 static int sockfd = -1;
@@ -527,50 +505,11 @@ int main(void) {
 }
 ```
 
-</details>
-
-### 3.3.3 File Protocol Pendukung
-
-Bagian ini adalah pasangan header dan implementasi helper. File ini tidak dijalankan langsung, tetapi dipakai saat compile `wired.c` dan `navi.c`.
-
-#### `protocol.h`
-
-<details>
-<summary><b>soal1/protocol.h</b></summary>
+### 3.3.3 `protocol.c`
 
 ```c
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
-
 #include <stddef.h>
 #include <sys/types.h>
-
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 4242
-#define BACKLOG 32
-#define MAX_NAME 64
-#define MAX_MSG 1024
-#define MAX_CLIENTS 64
-#define ADMIN_NAME "The Knights"
-#define ADMIN_PASSWORD "protocol7"
-
-ssize_t send_all(int fd, const void *buf, size_t len);
-int send_line(int fd, const char *line);
-ssize_t recv_line(int fd, char *buf, size_t cap);
-void trim_newline(char *s);
-
-#endif
-```
-
-</details>
-
-#### `protocol.c`
-
-<details>
-<summary><b>soal1/protocol.c</b></summary>
-
-```c
-#include "protocol.h"
 #include <errno.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -632,13 +571,11 @@ void trim_newline(char *s) {
 }
 ```
 
-</details>
-
 ---
 
-## 3.4 Cara Running dan Hasil per Tahap Soal 1
+## 3.4 Cara Running dan Hasil per Tahap
 
-### Tahap 1 - Masuk ke folder Soal 1
+### Tahap 1 - Masuk folder Soal 1
 
 ```bash
 cd ~/Modul3/soal1
@@ -650,9 +587,19 @@ Hasil yang diharapkan:
 Terminal berada di folder soal1.
 ```
 
----
+### Tahap 2 - Bersihkan file hasil run lama
 
-### Tahap 2 - Compile program
+```bash
+rm -f wired navi *.o history.log
+```
+
+Hasil yang diharapkan:
+
+```text
+Tidak ada output jika berhasil.
+```
+
+### Tahap 3 - Compile program
 
 ```bash
 gcc -Wall -Wextra -pthread -o wired wired.c protocol.c
@@ -675,14 +622,12 @@ ls
 Hasil yang diharapkan:
 
 ```text
-navi  navi.c  protocol.c  protocol.h  wired  wired.c
+navi  navi.c  protocol.c  wired  wired.c
 ```
 
----
+### Tahap 4 - Test error client tanpa server
 
-### Tahap 3 - Test error client tanpa server
-
-Jalankan client saat server belum menyala:
+Sebelum menjalankan server, jalankan client:
 
 ```bash
 ./navi
@@ -694,13 +639,9 @@ Hasil yang diharapkan:
 connect: Connection refused
 ```
 
-Penjelasan:
+Artinya error handling benar karena client tidak bisa connect saat server belum berjalan.
 
-Client gagal connect karena server `wired` belum dijalankan.
-
----
-
-### Tahap 4 - Jalankan server
+### Tahap 5 - Jalankan server
 
 Terminal 1:
 
@@ -715,9 +656,7 @@ Hasil yang diharapkan:
 The Wired is listening on 127.0.0.1:4242
 ```
 
----
-
-### Tahap 5 - Jalankan client user biasa
+### Tahap 6 - Jalankan client user biasa
 
 Terminal 2:
 
@@ -726,7 +665,7 @@ cd ~/Modul3/soal1
 ./navi
 ```
 
-Masukkan username:
+Input:
 
 ```text
 alice
@@ -735,12 +674,11 @@ alice
 Hasil yang diharapkan:
 
 ```text
+Enter your name:
 --- Welcome to The Wired, alice ---
 ```
 
----
-
-### Tahap 6 - Test duplicate username
+### Tahap 7 - Test chat antar client
 
 Terminal 3:
 
@@ -749,7 +687,39 @@ cd ~/Modul3/soal1
 ./navi
 ```
 
-Masukkan username yang sudah dipakai:
+Input:
+
+```text
+bob
+```
+
+Hasil yang diharapkan:
+
+```text
+--- Welcome to The Wired, bob ---
+```
+
+Di terminal `alice`, ketik:
+
+```text
+halo bob
+```
+
+Di terminal `bob`, hasil yang diharapkan:
+
+```text
+[alice]: halo bob
+```
+
+### Tahap 8 - Test username duplikat
+
+Buka client baru:
+
+```bash
+./navi
+```
+
+Input username yang sudah dipakai:
 
 ```text
 alice
@@ -762,46 +732,27 @@ Hasil yang diharapkan:
 Enter your name:
 ```
 
-Masukkan username baru:
+Masukkan nama lain:
 
 ```text
-lain
+charlie
 ```
 
 Hasil yang diharapkan:
 
 ```text
---- Welcome to The Wired, lain ---
+--- Welcome to The Wired, charlie ---
 ```
 
----
+### Tahap 9 - Test admin login benar
 
-### Tahap 7 - Test broadcast chat
-
-Pada terminal `alice`, kirim pesan:
-
-```text
-hello lain
-```
-
-Pada terminal `lain`, hasil yang diharapkan:
-
-```text
-[alice]: hello lain
-```
-
----
-
-### Tahap 8 - Test admin login benar
-
-Terminal baru:
+Buka client baru:
 
 ```bash
-cd ~/Modul3/soal1
 ./navi
 ```
 
-Input username admin:
+Input nama:
 
 ```text
 The Knights
@@ -825,14 +776,45 @@ Hasil yang diharapkan:
 Command >>
 ```
 
----
+### Tahap 10 - Test admin cek user aktif
 
-### Tahap 9 - Test admin password salah
+Input:
 
-Terminal baru:
+```text
+1
+```
+
+Hasil yang diharapkan:
+
+```text
+[Admin] Active NAVI users:
+ - alice
+ - bob
+ - charlie
+Total NAVI users: 3
+```
+
+Jumlah user dapat berbeda tergantung client yang masih aktif.
+
+### Tahap 11 - Test admin cek uptime
+
+Input:
+
+```text
+2
+```
+
+Hasil yang diharapkan:
+
+```text
+[Admin] Server uptime: <angka> seconds
+```
+
+### Tahap 12 - Test password admin salah
+
+Buka client baru:
 
 ```bash
-cd ~/Modul3/soal1
 ./navi
 ```
 
@@ -849,46 +831,9 @@ Hasil yang diharapkan:
 [System] Authentication failed. Disconnecting...
 ```
 
----
+### Tahap 13 - Test command admin tidak valid
 
-### Tahap 10 - Test admin cek user aktif
-
-Pada admin console, input:
-
-```text
-1
-```
-
-Hasil yang diharapkan:
-
-```text
-[Admin] Active NAVI users:
- - alice
- - lain
-Total NAVI users: 2
-```
-
----
-
-### Tahap 11 - Test admin cek uptime
-
-Pada admin console, input:
-
-```text
-2
-```
-
-Hasil yang diharapkan:
-
-```text
-[Admin] Server uptime: <angka> seconds
-```
-
----
-
-### Tahap 12 - Test admin command tidak valid
-
-Pada admin console, input:
+Di menu admin, input:
 
 ```text
 9
@@ -900,11 +845,9 @@ Hasil yang diharapkan:
 [Admin] Unknown command.
 ```
 
----
+### Tahap 14 - Test emergency shutdown
 
-### Tahap 13 - Test emergency shutdown
-
-Pada admin console, input:
+Di menu admin, input:
 
 ```text
 3
@@ -917,20 +860,18 @@ Hasil yang diharapkan di client lain:
 [System] Disconnecting from The Wired...
 ```
 
----
-
-### Tahap 14 - Cek file log
+### Tahap 15 - Cek history log
 
 ```bash
 cat history.log
 ```
 
-Contoh hasil yang diharapkan:
+Contoh hasil:
 
 ```text
 [YYYY-MM-DD HH:MM:SS] [System] [SERVER ONLINE]
 [YYYY-MM-DD HH:MM:SS] [System] [User 'alice' connected]
-[YYYY-MM-DD HH:MM:SS] [User] [[alice]: hello lain]
+[YYYY-MM-DD HH:MM:SS] [User] [[alice]: halo bob]
 [YYYY-MM-DD HH:MM:SS] [Admin] [RPC_GET_USERS]
 [YYYY-MM-DD HH:MM:SS] [Admin] [RPC_GET_UPTIME]
 [YYYY-MM-DD HH:MM:SS] [System] [EMERGENCY SHUTDOWN INITIATED]
@@ -938,25 +879,13 @@ Contoh hasil yang diharapkan:
 
 ---
 
-## 3.5 Ringkasan Error Handling Soal 1
+## 3.5 Penjelasan Kode per Bagian
 
-| Error Case | Cara Test | Hasil yang Diharapkan |
-|---|---|---|
-| Client tanpa server | Jalankan `./navi` sebelum `./wired` | `connect: Connection refused` |
-| Username duplicate | Login dua client dengan nama sama | Client diminta input nama lain |
-| Password admin salah | Login `The Knights` dengan password salah | Authentication failed |
-| Command admin invalid | Input `9` pada admin console | Unknown command |
-| Emergency shutdown | Admin pilih menu `3` | Semua client diputus |
+### 3.5.1 `wired.c`
 
----
+`wired.c` adalah server utama. File ini bertugas membuka socket, menerima koneksi client, membuat thread untuk setiap client, mengatur daftar client aktif, menangani admin, melakukan broadcast chat, dan mencatat log ke `history.log`.
 
-## 3.6 Penjelasan Kode per Bagian Soal 1
-
-### `protocol.h`
-
-File ini menyimpan konfigurasi yang digunakan bersama oleh client dan server.
-
-Bagian penting:
+Bagian konfigurasi:
 
 ```c
 #define SERVER_IP "127.0.0.1"
@@ -969,49 +898,9 @@ Bagian penting:
 #define ADMIN_PASSWORD "protocol7"
 ```
 
-Konfigurasi tersebut menentukan alamat server, port, jumlah maksimal client, ukuran buffer pesan, dan data login admin.
+Konfigurasi tersebut menentukan IP server, port, batas antrian, panjang nama, panjang pesan, jumlah maksimal client, serta data login admin.
 
----
-
-### `protocol.c`
-
-File ini berisi helper komunikasi socket.
-
-Fungsi utama:
-
-| Fungsi | Penjelasan |
-|---|---|
-| `send_all()` | Mengirim seluruh byte ke socket sampai selesai |
-| `send_line()` | Mengirim string dengan tambahan newline |
-| `recv_line()` | Membaca pesan dari socket sampai newline |
-| `trim_newline()` | Menghapus newline dari input user |
-
-Fungsi `send_all()` penting karena `send()` pada socket belum tentu langsung mengirim seluruh data dalam satu kali pemanggilan.
-
----
-
-### `navi.c`
-
-`navi.c` adalah client.
-
-Alurnya:
-
-1. Membuat socket dengan `socket()`.
-2. Connect ke server menggunakan `connect()`.
-3. Membuat thread receiver dengan `pthread_create()`.
-4. Membaca input user dengan `fgets()`.
-5. Mengirim input ke server menggunakan `send_line()`.
-6. Keluar saat koneksi server ditutup atau user memilih keluar.
-
-Thread receiver digunakan agar client tetap bisa menerima pesan server sambil user mengetik pesan baru.
-
----
-
-### `wired.c`
-
-`wired.c` adalah server utama.
-
-Server menyimpan data client dalam struct:
+Struct `Client` menyimpan data setiap client:
 
 ```c
 typedef struct {
@@ -1023,56 +912,80 @@ typedef struct {
 } Client;
 ```
 
-Bagian penting:
+Fungsi penting pada `wired.c`:
 
-| Bagian | Fungsi |
+| Fungsi | Penjelasan |
 |---|---|
-| `clients_lock` | Mutex untuk melindungi array client |
-| `log_lock` | Mutex untuk melindungi penulisan log |
-| `history_log()` | Menulis aktivitas ke `history.log` |
-| `broadcast_msg()` | Mengirim pesan ke semua client aktif |
-| `name_exists_locked()` | Mengecek username duplicate |
-| `handle_admin_command()` | Memproses perintah admin |
+| `timestamp()` | Membuat timestamp untuk log |
+| `history_log()` | Menulis aktivitas server ke `history.log` |
+| `broadcast_msg()` | Mengirim pesan ke semua client aktif selain pengirim |
+| `name_exists_locked()` | Mengecek apakah username sudah dipakai |
+| `add_client()` | Menambahkan client ke daftar client aktif |
+| `remove_client()` | Menghapus client dari daftar aktif |
+| `send_admin_menu()` | Menampilkan menu admin |
+| `handle_admin_command()` | Menjalankan command admin |
 | `client_worker()` | Thread handler untuk setiap client |
-| `close_all_clients()` | Menutup semua koneksi saat shutdown |
+| `close_all_clients()` | Menutup semua client saat shutdown |
+| `main()` | Membuat socket server dan menerima koneksi |
 
-Mutex digunakan karena server berjalan multithread. Tanpa mutex, beberapa thread dapat mengakses data client bersamaan dan menyebabkan race condition.
+Server menggunakan mutex agar data client dan log aman dari race condition.
+
+### 3.5.2 `navi.c`
+
+`navi.c` adalah client. Program ini bertugas membuat koneksi ke server, menerima pesan dari server, dan mengirim input user.
+
+Alur utama `navi.c`:
+
+1. Membuat socket TCP.
+2. Menghubungkan socket ke server.
+3. Membuat thread receiver.
+4. Membaca input dari user.
+5. Mengirim input ke server.
+6. Keluar jika user mengetik `/exit`.
+
+Thread receiver membuat client bisa menerima pesan dari server sambil tetap bisa mengetik input.
+
+### 3.5.3 `protocol.c`
+
+`protocol.c` adalah file helper untuk komunikasi socket.
+
+Fungsi penting:
+
+| Fungsi | Penjelasan |
+|---|---|
+| `send_all()` | Memastikan seluruh byte terkirim ke socket |
+| `send_line()` | Mengirim pesan string dan menambahkan newline jika perlu |
+| `recv_line()` | Membaca pesan dari socket sampai newline |
+| `trim_newline()` | Menghapus newline dari input |
+
+File ini membuat `wired.c` dan `navi.c` lebih rapi karena logic kirim/terima pesan tidak ditulis berulang.
 
 ---
 
 # 4. Reporting Soal 2
 
-## 4.1 Deskripsi Soal
+## 4.1 Deskripsi
 
-Soal 2 membuat game terminal bernama **Battle of Eterion**.
+Soal 2 mengimplementasikan game terminal **Battle of Eterion**. Program terdiri dari server `orion` dan client `eternal`.
 
-Program terdiri dari:
+Komunikasi antara client dan server menggunakan IPC:
 
-* `orion` sebagai server
-* `eternal` sebagai client
+* **Message Queue** untuk request-response.
+* **Shared Memory** untuk menyimpan data arena bersama.
+* **Process-shared Mutex** untuk mencegah race condition.
 
-Program menggunakan IPC System V:
+Fitur utama Soal 2:
 
-* Message Queue untuk request dan response
-* Shared Memory untuk menyimpan data arena
-* Mutex process-shared untuk sinkronisasi
-
-Fitur yang dibuat:
-
-1. Register akun player.
-2. Login akun player.
-3. Mencegah login akun yang sedang aktif di session lain.
-4. Menampilkan profile player.
-5. Menampilkan armory.
-6. Membeli weapon.
-7. Menolak pembelian jika gold tidak cukup.
-8. Menolak pembelian weapon yang sudah dimiliki.
-9. Matchmaking player.
-10. Jika tidak ada lawan selama 35 detik, player melawan bot.
-11. Battle realtime dengan attack, ultimate, dan give up.
-12. Cooldown attack.
-13. Match history.
-14. Error handling jika `eternal` dijalankan tanpa `orion`.
+1. Register player.
+2. Login player.
+3. Profile player.
+4. Armory dan pembelian weapon.
+5. Match history.
+6. Matchmaking player.
+7. Bot muncul jika tidak ada lawan setelah 35 detik.
+8. Battle realtime dengan tombol `a`, `u`, dan `q`.
+9. Reward XP dan gold setelah battle.
+10. Error handling untuk server mati, password salah, akun aktif, gold kurang, weapon sudah dimiliki, cooldown, dan ultimate tanpa weapon.
 
 ---
 
@@ -1080,19 +993,16 @@ Fitur yang dibuat:
 
 | File | Fungsi |
 |---|---|
-| `arena.h` | Header struktur data, command, response, weapon, dan key IPC |
-| `Makefile` | Compile program dan membersihkan IPC |
+| `arena.h` | Konfigurasi, struktur data, key IPC, command, response, weapon |
+| `orion.c` | Server utama game |
 | `eternal.c` | Client player |
-| `orion.c` | Server game |
+| `Makefile` | Compile dan cleanup IPC |
 
 ---
 
-## 4.3 Kode Lengkap Soal 2
+## 4.3 Kode Lengkap
 
 ### 4.3.1 `arena.h`
-
-<details>
-<summary><b>soal2/arena.h</b></summary>
 
 ```c
 #ifndef ARENA_H
@@ -1220,412 +1130,9 @@ typedef struct {
 #define RSP_SIZE (sizeof(Response) - sizeof(long))
 
 #endif
-
 ```
 
-</details>
-
-### 4.3.2 `Makefile`
-
-<details>
-<summary><b>soal2/Makefile</b></summary>
-
-```makefile
-CC = gcc
-CFLAGS = -Wall -pthread
-LDFLAGS = -lrt
-
-all: server client
-
-server: orion.c arena.h
-	$(CC) $(CFLAGS) orion.c -o orion $(LDFLAGS)
-
-client: eternal.c arena.h
-	$(CC) $(CFLAGS) eternal.c -o eternal $(LDFLAGS)
-
-clean:
-	rm -f orion eternal
-
-clear_ipc:
-	-ipcs -q | grep 0x0001234 | awk '{print $$2}' | xargs -r ipcrm -q
-	-ipcs -m | grep 0x0005678 | awk '{print $$2}' | xargs -r ipcrm -m
-	-ipcs -s | grep 0x0009012 | awk '{print $$2}' | xargs -r ipcrm -s
-
-```
-
-</details>
-
-### 4.3.3 `eternal.c`
-
-<details>
-<summary><b>soal2/eternal.c</b></summary>
-
-```c
-#include "arena.h"
-#include <errno.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
-#include <sys/select.h>
-#include <sys/shm.h>
-#include <termios.h>
-#include <time.h>
-#include <unistd.h>
-
-static int msg_id = -1;
-static pid_t mypid;
-static int logged_in = 0;
-static char current_user[NAME_LEN];
-static struct termios old_term;
-static int raw_enabled = 0;
-
-static void disable_raw(void) {
-    if (raw_enabled) {
-        tcsetattr(STDIN_FILENO, TCSANOW, &old_term);
-        raw_enabled = 0;
-    }
-}
-
-static void enable_raw(void) {
-    if (raw_enabled) return;
-    if (tcgetattr(STDIN_FILENO, &old_term) == 0) {
-        struct termios raw = old_term;
-        raw.c_lflag &= (tcflag_t)~(ICANON | ECHO);
-        raw.c_cc[VMIN] = 0;
-        raw.c_cc[VTIME] = 0;
-        tcsetattr(STDIN_FILENO, TCSANOW, &raw);
-        raw_enabled = 1;
-    }
-}
-
-static void trim(char *s) {
-    s[strcspn(s, "\n")] = '\0';
-}
-
-static void ask(const char *prompt, char *buf, size_t cap) {
-    printf("%s", prompt);
-    fflush(stdout);
-    if (!fgets(buf, cap, stdin)) buf[0] = '\0';
-    trim(buf);
-}
-
-
-static void clear_screen(void) {
-    printf("\033[2J\033[H");
-}
-
-static void print_logo(void) {
-    printf("\033[36m");
-    printf("  ____        _   _   _        ___   _____   _____   _____   ____   ___   ___   _   _\n");
-    printf(" | __ )  ___ | |_| |_| | ___  / _ \\ |  ___| | ____| |_   _| |  _ \\ |_ _| / _ \\ | \\ | |\n");
-    printf(" |  _ \\ / _ \\| __| __| |/ _ \\| | | || |_    |  _|     | |   | |_) | | | | | | ||  \\| |\n");
-    printf(" | |_) |  __/| |_| |_| |  __/| |_| ||  _|   | |___    | |   |  _ <  | | | |_| || |\\  |\n");
-    printf(" |____/ \\___| \\__|\\__|_|\\___| \\___/ |_|     |_____|   |_|   |_| \\_\\|___| \\___/ |_| \\_|\n");
-    printf("\033[0m");
-}
-
-static int connect_ipc(void) {
-    msg_id = msgget(MSG_KEY, 0666);
-    if (msg_id < 0) {
-        printf("Orion are you there?\n");
-        return -1;
-    }
-
-    int shm_id = shmget(SHM_KEY, sizeof(Arena), 0666);
-    if (shm_id < 0) {
-        printf("Orion are you there?\n");
-        return -1;
-    }
-
-    Arena *probe = (Arena *)shmat(shm_id, NULL, 0);
-    if (probe == (void *)-1) {
-        printf("Orion are you there?\n");
-        return -1;
-    }
-
-    pid_t orion_pid = probe->orion_pid;
-    int alive = (orion_pid > 0 && kill(orion_pid, 0) == 0);
-    shmdt(probe);
-
-    if (!alive) {
-        printf("Orion are you there?\n");
-        return -1;
-    }
-
-    return 0;
-}
-
-static int send_req(int cmd, const char *username, const char *password, int value, Response *rsp) {
-    Request req;
-    memset(&req, 0, sizeof(req));
-    req.mtype = 1;
-    req.pid = mypid;
-    req.cmd = cmd;
-    req.value = value;
-    if (username) snprintf(req.username, sizeof(req.username), "%s", username);
-    if (password) snprintf(req.password, sizeof(req.password), "%s", password);
-    if (msgsnd(msg_id, &req, REQ_SIZE, 0) < 0) {
-        perror("msgsnd");
-        return -1;
-    }
-    if (!rsp) return 0;
-    while (1) {
-        ssize_t n = msgrcv(msg_id, rsp, RSP_SIZE, mypid, 0);
-        if (n < 0) {
-            if (errno == EINTR) continue;
-            perror("msgrcv");
-            return -1;
-        }
-        break;
-    }
-    logged_in = rsp->logged_in;
-    if (rsp->username[0]) snprintf(current_user, sizeof(current_user), "%s", rsp->username);
-    if (!logged_in) current_user[0] = '\0';
-    return rsp->status;
-}
-
-static void print_rsp(Response *rsp) {
-    printf("%s\n", rsp->text);
-}
-
-static void do_register(void) {
-    char u[NAME_LEN], p[PASS_LEN];
-    ask("Username: ", u, sizeof(u));
-    ask("Password: ", p, sizeof(p));
-    Response rsp;
-    send_req(CMD_REGISTER, u, p, 0, &rsp);
-    print_rsp(&rsp);
-}
-
-static void do_login(void) {
-    char u[NAME_LEN], p[PASS_LEN];
-    ask("Username: ", u, sizeof(u));
-    ask("Password: ", p, sizeof(p));
-    Response rsp;
-    send_req(CMD_LOGIN, u, p, 0, &rsp);
-    print_rsp(&rsp);
-}
-
-static void do_logout(void) {
-    Response rsp;
-    send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
-    print_rsp(&rsp);
-}
-
-static void pause_enter(void) {
-    printf("Press ENTER to continue...");
-    fflush(stdout);
-    char tmp[8];
-    fgets(tmp, sizeof(tmp), stdin);
-}
-
-static void armory_menu(void) {
-    while (1) {
-        Response rsp;
-        send_req(CMD_ARMORY, NULL, NULL, 0, &rsp);
-        print_rsp(&rsp);
-        char ch[16];
-        ask("Choice: ", ch, sizeof(ch));
-        int choice = atoi(ch);
-        if (choice == 0) return;
-        send_req(CMD_ARMORY, NULL, NULL, choice, &rsp);
-        print_rsp(&rsp);
-        pause_enter();
-    }
-}
-
-static void render_battle(Response *rsp) {
-    printf("\033[2J\033[H");
-    print_rsp(rsp);
-    fflush(stdout);
-}
-
-static void battle_mode(void) {
-    Response rsp;
-    int st = send_req(CMD_ENTER_BATTLE, NULL, NULL, 0, &rsp);
-    render_battle(&rsp);
-    enable_raw();
-    while (1) {
-        if (st == RSP_ENDED || st == RSP_ERR) break;
-        fd_set rfds;
-        FD_ZERO(&rfds);
-        FD_SET(STDIN_FILENO, &rfds);
-        struct timeval tv;
-        tv.tv_sec = 1;
-        tv.tv_usec = 0;
-        int sel = select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv);
-        if (sel > 0 && FD_ISSET(STDIN_FILENO, &rfds)) {
-            char c;
-            if (read(STDIN_FILENO, &c, 1) <= 0) continue;
-            if (c == 'a' || c == 'A') st = send_req(CMD_ATTACK, NULL, NULL, 0, &rsp);
-            else if (c == 'u' || c == 'U') st = send_req(CMD_ULTIMATE, NULL, NULL, 0, &rsp);
-            else if (c == 'q' || c == 'Q') st = send_req(CMD_FORFEIT, NULL, NULL, 0, &rsp);
-            else continue;
-        } else {
-            st = send_req(CMD_BATTLE_STATUS, NULL, NULL, 0, &rsp);
-        }
-        render_battle(&rsp);
-        if (st == RSP_ENDED || st == RSP_ERR || st == RSP_OK) break;
-    }
-    disable_raw();
-    char tmp[8];
-    fgets(tmp, sizeof(tmp), stdin);
-}
-
-static void logged_menu(void) {
-    while (logged_in) {
-        clear_screen();
-        print_logo();
-        printf("\n\033[35m+====================== ETERION ======================+\033[0m\n");
-        printf("| Logged in as: %-39s |\n", current_user);
-        printf("+-----------------------------------------------------+\n");
-        printf("| 1. Profile                                          |\n");
-        printf("| 2. Battle                                           |\n");
-        printf("| 3. Armory                                           |\n");
-        printf("| 4. Match History                                    |\n");
-        printf("| 5. Logout                                           |\n");
-        printf("| 6. Exit                                             |\n");
-        printf("+=====================================================+\n");
-        printf("Choice: ");
-        fflush(stdout);
-        char ch[16];
-        if (!fgets(ch, sizeof(ch), stdin)) break;
-        int choice = atoi(ch);
-        Response rsp;
-        clear_screen();
-        switch (choice) {
-            case 1:
-                send_req(CMD_PROFILE, NULL, NULL, 0, &rsp);
-                print_rsp(&rsp);
-                pause_enter();
-                break;
-            case 2:
-                battle_mode();
-                break;
-            case 3:
-                armory_menu();
-                break;
-            case 4:
-                send_req(CMD_HISTORY, NULL, NULL, 0, &rsp);
-                print_rsp(&rsp);
-                pause_enter();
-                break;
-            case 5:
-                do_logout();
-                return;
-            case 6:
-                do_logout();
-                exit(0);
-            default:
-                printf("Invalid choice.\n");
-                pause_enter();
-        }
-    }
-}
-
-static void interactive(void) {
-    while (1) {
-        clear_screen();
-        print_logo();
-        printf("\n\033[33m+==================== MAIN GATE ======================+\033[0m\n");
-        printf("| 1. Register                                         |\n");
-        printf("| 2. Login                                            |\n");
-        printf("| 3. Exit                                             |\n");
-        printf("+=====================================================+\n");
-        printf("Choice: ");
-        fflush(stdout);
-        char ch[16];
-        if (!fgets(ch, sizeof(ch), stdin)) break;
-        int choice = atoi(ch);
-        clear_screen();
-        switch (choice) {
-            case 1: do_register(); pause_enter(); break;
-            case 2: do_login(); if (logged_in) logged_menu(); else pause_enter(); break;
-            case 3: return;
-            default: printf("Invalid choice.\n"); pause_enter(); break;
-        }
-    }
-}
-
-static int batch_mode(int argc, char **argv) {
-    if (argc < 2) return 0;
-    Response rsp;
-    if (strcmp(argv[1], "--register") == 0 && argc >= 4) {
-        send_req(CMD_REGISTER, argv[2], argv[3], 0, &rsp);
-        print_rsp(&rsp);
-        return 1;
-    }
-    if (strcmp(argv[1], "--login-profile") == 0 && argc >= 4) {
-        send_req(CMD_LOGIN, argv[2], argv[3], 0, &rsp);
-        print_rsp(&rsp);
-        if (rsp.status == RSP_OK) {
-            send_req(CMD_PROFILE, NULL, NULL, 0, &rsp);
-            print_rsp(&rsp);
-            send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
-        }
-        return 1;
-    }
-    if (strcmp(argv[1], "--buy") == 0 && argc >= 5) {
-        send_req(CMD_LOGIN, argv[2], argv[3], 0, &rsp);
-        if (rsp.status != RSP_OK) { print_rsp(&rsp); return 1; }
-        send_req(CMD_ARMORY, NULL, NULL, atoi(argv[4]), &rsp);
-        print_rsp(&rsp);
-        send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
-        return 1;
-    }
-    if (strcmp(argv[1], "--history") == 0 && argc >= 4) {
-        send_req(CMD_LOGIN, argv[2], argv[3], 0, &rsp);
-        if (rsp.status != RSP_OK) { print_rsp(&rsp); return 1; }
-        send_req(CMD_HISTORY, NULL, NULL, 0, &rsp);
-        print_rsp(&rsp);
-        send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
-        return 1;
-    }
-    if (strcmp(argv[1], "--shutdown-orion") == 0) {
-        send_req(CMD_SHUTDOWN, NULL, NULL, 0, &rsp);
-        print_rsp(&rsp);
-        return 1;
-    }
-    return 0;
-}
-
-static void on_signal(int sig) {
-    (void)sig;
-    disable_raw();
-    if (msg_id >= 0) {
-        Response rsp;
-        send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
-    }
-    exit(0);
-}
-
-int main(int argc, char **argv) {
-    mypid = getpid();
-    signal(SIGINT, on_signal);
-    signal(SIGTERM, on_signal);
-    atexit(disable_raw);
-
-    if (connect_ipc() < 0) return 1;
-    if (batch_mode(argc, argv)) return 0;
-    interactive();
-    if (logged_in) {
-        Response rsp;
-        send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
-    }
-    return 0;
-}
-
-```
-
-</details>
-
-### 4.3.4 `orion.c`
-
-<details>
-<summary><b>soal2/orion.c</b></summary>
+### 4.3.2 `orion.c`
 
 ```c
 #include "arena.h"
@@ -2393,18 +1900,398 @@ int main(void) {
     cleanup(1);
     return 0;
 }
-
 ```
 
-</details>
+### 4.3.3 `eternal.c`
+
+```c
+#include "arena.h"
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <sys/select.h>
+#include <sys/shm.h>
+#include <termios.h>
+#include <time.h>
+#include <unistd.h>
+
+static int msg_id = -1;
+static pid_t mypid;
+static int logged_in = 0;
+static char current_user[NAME_LEN];
+static struct termios old_term;
+static int raw_enabled = 0;
+
+static void disable_raw(void) {
+    if (raw_enabled) {
+        tcsetattr(STDIN_FILENO, TCSANOW, &old_term);
+        raw_enabled = 0;
+    }
+}
+
+static void enable_raw(void) {
+    if (raw_enabled) return;
+    if (tcgetattr(STDIN_FILENO, &old_term) == 0) {
+        struct termios raw = old_term;
+        raw.c_lflag &= (tcflag_t)~(ICANON | ECHO);
+        raw.c_cc[VMIN] = 0;
+        raw.c_cc[VTIME] = 0;
+        tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+        raw_enabled = 1;
+    }
+}
+
+static void trim(char *s) {
+    s[strcspn(s, "\n")] = '\0';
+}
+
+static void ask(const char *prompt, char *buf, size_t cap) {
+    printf("%s", prompt);
+    fflush(stdout);
+    if (!fgets(buf, cap, stdin)) buf[0] = '\0';
+    trim(buf);
+}
+
+
+static void clear_screen(void) {
+    printf("\033[2J\033[H");
+}
+
+static void print_logo(void) {
+    printf("\033[36m");
+    printf("  ____        _   _   _        ___   _____   _____   _____   ____   ___   ___   _   _\n");
+    printf(" | __ )  ___ | |_| |_| | ___  / _ \\ |  ___| | ____| |_   _| |  _ \\ |_ _| / _ \\ | \\ | |\n");
+    printf(" |  _ \\ / _ \\| __| __| |/ _ \\| | | || |_    |  _|     | |   | |_) | | | | | | ||  \\| |\n");
+    printf(" | |_) |  __/| |_| |_| |  __/| |_| ||  _|   | |___    | |   |  _ <  | | | |_| || |\\  |\n");
+    printf(" |____/ \\___| \\__|\\__|_|\\___| \\___/ |_|     |_____|   |_|   |_| \\_\\|___| \\___/ |_| \\_|\n");
+    printf("\033[0m");
+}
+
+static int connect_ipc(void) {
+    msg_id = msgget(MSG_KEY, 0666);
+    if (msg_id < 0) {
+        printf("Orion are you there?\n");
+        return -1;
+    }
+
+    int shm_id = shmget(SHM_KEY, sizeof(Arena), 0666);
+    if (shm_id < 0) {
+        printf("Orion are you there?\n");
+        return -1;
+    }
+
+    Arena *probe = (Arena *)shmat(shm_id, NULL, 0);
+    if (probe == (void *)-1) {
+        printf("Orion are you there?\n");
+        return -1;
+    }
+
+    pid_t orion_pid = probe->orion_pid;
+    int alive = (orion_pid > 0 && kill(orion_pid, 0) == 0);
+    shmdt(probe);
+
+    if (!alive) {
+        printf("Orion are you there?\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+static int send_req(int cmd, const char *username, const char *password, int value, Response *rsp) {
+    Request req;
+    memset(&req, 0, sizeof(req));
+    req.mtype = 1;
+    req.pid = mypid;
+    req.cmd = cmd;
+    req.value = value;
+    if (username) snprintf(req.username, sizeof(req.username), "%s", username);
+    if (password) snprintf(req.password, sizeof(req.password), "%s", password);
+    if (msgsnd(msg_id, &req, REQ_SIZE, 0) < 0) {
+        perror("msgsnd");
+        return -1;
+    }
+    if (!rsp) return 0;
+    while (1) {
+        ssize_t n = msgrcv(msg_id, rsp, RSP_SIZE, mypid, 0);
+        if (n < 0) {
+            if (errno == EINTR) continue;
+            perror("msgrcv");
+            return -1;
+        }
+        break;
+    }
+    logged_in = rsp->logged_in;
+    if (rsp->username[0]) snprintf(current_user, sizeof(current_user), "%s", rsp->username);
+    if (!logged_in) current_user[0] = '\0';
+    return rsp->status;
+}
+
+static void print_rsp(Response *rsp) {
+    printf("%s\n", rsp->text);
+}
+
+static void do_register(void) {
+    char u[NAME_LEN], p[PASS_LEN];
+    ask("Username: ", u, sizeof(u));
+    ask("Password: ", p, sizeof(p));
+    Response rsp;
+    send_req(CMD_REGISTER, u, p, 0, &rsp);
+    print_rsp(&rsp);
+}
+
+static void do_login(void) {
+    char u[NAME_LEN], p[PASS_LEN];
+    ask("Username: ", u, sizeof(u));
+    ask("Password: ", p, sizeof(p));
+    Response rsp;
+    send_req(CMD_LOGIN, u, p, 0, &rsp);
+    print_rsp(&rsp);
+}
+
+static void do_logout(void) {
+    Response rsp;
+    send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
+    print_rsp(&rsp);
+}
+
+static void pause_enter(void) {
+    printf("Press ENTER to continue...");
+    fflush(stdout);
+    char tmp[8];
+    fgets(tmp, sizeof(tmp), stdin);
+}
+
+static void armory_menu(void) {
+    while (1) {
+        Response rsp;
+        send_req(CMD_ARMORY, NULL, NULL, 0, &rsp);
+        print_rsp(&rsp);
+        char ch[16];
+        ask("Choice: ", ch, sizeof(ch));
+        int choice = atoi(ch);
+        if (choice == 0) return;
+        send_req(CMD_ARMORY, NULL, NULL, choice, &rsp);
+        print_rsp(&rsp);
+        pause_enter();
+    }
+}
+
+static void render_battle(Response *rsp) {
+    printf("\033[2J\033[H");
+    print_rsp(rsp);
+    fflush(stdout);
+}
+
+static void battle_mode(void) {
+    Response rsp;
+    int st = send_req(CMD_ENTER_BATTLE, NULL, NULL, 0, &rsp);
+    render_battle(&rsp);
+    enable_raw();
+    while (1) {
+        if (st == RSP_ENDED || st == RSP_ERR) break;
+        fd_set rfds;
+        FD_ZERO(&rfds);
+        FD_SET(STDIN_FILENO, &rfds);
+        struct timeval tv;
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+        int sel = select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv);
+        if (sel > 0 && FD_ISSET(STDIN_FILENO, &rfds)) {
+            char c;
+            if (read(STDIN_FILENO, &c, 1) <= 0) continue;
+            if (c == 'a' || c == 'A') st = send_req(CMD_ATTACK, NULL, NULL, 0, &rsp);
+            else if (c == 'u' || c == 'U') st = send_req(CMD_ULTIMATE, NULL, NULL, 0, &rsp);
+            else if (c == 'q' || c == 'Q') st = send_req(CMD_FORFEIT, NULL, NULL, 0, &rsp);
+            else continue;
+        } else {
+            st = send_req(CMD_BATTLE_STATUS, NULL, NULL, 0, &rsp);
+        }
+        render_battle(&rsp);
+        if (st == RSP_ENDED || st == RSP_ERR || st == RSP_OK) break;
+    }
+    disable_raw();
+    char tmp[8];
+    fgets(tmp, sizeof(tmp), stdin);
+}
+
+static void logged_menu(void) {
+    while (logged_in) {
+        clear_screen();
+        print_logo();
+        printf("\n\033[35m+====================== ETERION ======================+\033[0m\n");
+        printf("| Logged in as: %-39s |\n", current_user);
+        printf("+-----------------------------------------------------+\n");
+        printf("| 1. Profile                                          |\n");
+        printf("| 2. Battle                                           |\n");
+        printf("| 3. Armory                                           |\n");
+        printf("| 4. Match History                                    |\n");
+        printf("| 5. Logout                                           |\n");
+        printf("| 6. Exit                                             |\n");
+        printf("+=====================================================+\n");
+        printf("Choice: ");
+        fflush(stdout);
+        char ch[16];
+        if (!fgets(ch, sizeof(ch), stdin)) break;
+        int choice = atoi(ch);
+        Response rsp;
+        clear_screen();
+        switch (choice) {
+            case 1:
+                send_req(CMD_PROFILE, NULL, NULL, 0, &rsp);
+                print_rsp(&rsp);
+                pause_enter();
+                break;
+            case 2:
+                battle_mode();
+                break;
+            case 3:
+                armory_menu();
+                break;
+            case 4:
+                send_req(CMD_HISTORY, NULL, NULL, 0, &rsp);
+                print_rsp(&rsp);
+                pause_enter();
+                break;
+            case 5:
+                do_logout();
+                return;
+            case 6:
+                do_logout();
+                exit(0);
+            default:
+                printf("Invalid choice.\n");
+                pause_enter();
+        }
+    }
+}
+
+static void interactive(void) {
+    while (1) {
+        clear_screen();
+        print_logo();
+        printf("\n\033[33m+==================== MAIN GATE ======================+\033[0m\n");
+        printf("| 1. Register                                         |\n");
+        printf("| 2. Login                                            |\n");
+        printf("| 3. Exit                                             |\n");
+        printf("+=====================================================+\n");
+        printf("Choice: ");
+        fflush(stdout);
+        char ch[16];
+        if (!fgets(ch, sizeof(ch), stdin)) break;
+        int choice = atoi(ch);
+        clear_screen();
+        switch (choice) {
+            case 1: do_register(); pause_enter(); break;
+            case 2: do_login(); if (logged_in) logged_menu(); else pause_enter(); break;
+            case 3: return;
+            default: printf("Invalid choice.\n"); pause_enter(); break;
+        }
+    }
+}
+
+static int batch_mode(int argc, char **argv) {
+    if (argc < 2) return 0;
+    Response rsp;
+    if (strcmp(argv[1], "--register") == 0 && argc >= 4) {
+        send_req(CMD_REGISTER, argv[2], argv[3], 0, &rsp);
+        print_rsp(&rsp);
+        return 1;
+    }
+    if (strcmp(argv[1], "--login-profile") == 0 && argc >= 4) {
+        send_req(CMD_LOGIN, argv[2], argv[3], 0, &rsp);
+        print_rsp(&rsp);
+        if (rsp.status == RSP_OK) {
+            send_req(CMD_PROFILE, NULL, NULL, 0, &rsp);
+            print_rsp(&rsp);
+            send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
+        }
+        return 1;
+    }
+    if (strcmp(argv[1], "--buy") == 0 && argc >= 5) {
+        send_req(CMD_LOGIN, argv[2], argv[3], 0, &rsp);
+        if (rsp.status != RSP_OK) { print_rsp(&rsp); return 1; }
+        send_req(CMD_ARMORY, NULL, NULL, atoi(argv[4]), &rsp);
+        print_rsp(&rsp);
+        send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
+        return 1;
+    }
+    if (strcmp(argv[1], "--history") == 0 && argc >= 4) {
+        send_req(CMD_LOGIN, argv[2], argv[3], 0, &rsp);
+        if (rsp.status != RSP_OK) { print_rsp(&rsp); return 1; }
+        send_req(CMD_HISTORY, NULL, NULL, 0, &rsp);
+        print_rsp(&rsp);
+        send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
+        return 1;
+    }
+    if (strcmp(argv[1], "--shutdown-orion") == 0) {
+        send_req(CMD_SHUTDOWN, NULL, NULL, 0, &rsp);
+        print_rsp(&rsp);
+        return 1;
+    }
+    return 0;
+}
+
+static void on_signal(int sig) {
+    (void)sig;
+    disable_raw();
+    if (msg_id >= 0) {
+        Response rsp;
+        send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
+    }
+    exit(0);
+}
+
+int main(int argc, char **argv) {
+    mypid = getpid();
+    signal(SIGINT, on_signal);
+    signal(SIGTERM, on_signal);
+    atexit(disable_raw);
+
+    if (connect_ipc() < 0) return 1;
+    if (batch_mode(argc, argv)) return 0;
+    interactive();
+    if (logged_in) {
+        Response rsp;
+        send_req(CMD_LOGOUT, NULL, NULL, 0, &rsp);
+    }
+    return 0;
+}
+```
+
+### 4.3.4 `Makefile`
+
+```makefile
+CC = gcc
+CFLAGS = -Wall -pthread
+LDFLAGS = -lrt
+
+all: server client
+
+server: orion.c arena.h
+	$(CC) $(CFLAGS) orion.c -o orion $(LDFLAGS)
+
+client: eternal.c arena.h
+	$(CC) $(CFLAGS) eternal.c -o eternal $(LDFLAGS)
+
+clean:
+	rm -f orion eternal
+
+clear_ipc:
+	-ipcs -q | grep 0x0001234 | awk '{print $$2}' | xargs -r ipcrm -q
+	-ipcs -m | grep 0x0005678 | awk '{print $$2}' | xargs -r ipcrm -m
+	-ipcs -s | grep 0x0009012 | awk '{print $$2}' | xargs -r ipcrm -s
+```
 
 ---
 
-## 4.4 Cara Running dari Reset Total dan Hasil per Tahap Soal 2
+## 4.4 Cara Running dan Hasil per Tahap
 
-### Tahap 1 - Matikan proses lama
-
-Karena sebelumnya program mungkin sudah pernah dijalankan, matikan semua proses lama dulu.
+### Tahap 1 - Reset proses lama
 
 ```bash
 pkill -f orion
@@ -2416,10 +2303,8 @@ pkill -f navi
 Hasil yang diharapkan:
 
 ```text
-Tidak ada output, atau proses lama berhasil dimatikan.
+Tidak ada output jika proses lama tidak sedang berjalan.
 ```
-
----
 
 ### Tahap 2 - Masuk folder Soal 2
 
@@ -2427,13 +2312,12 @@ Tidak ada output, atau proses lama berhasil dimatikan.
 cd ~/Modul3/soal2
 ```
 
----
-
 ### Tahap 3 - Compile ulang
 
 ```bash
-find . -exec touch {} \;
 make clean
+make clear_ipc
+find . -exec touch {} \;
 make
 ```
 
@@ -2453,37 +2337,13 @@ ls
 Hasil yang diharapkan:
 
 ```text
-Makefile  arena.h  eternal  eternal.c  orion  orion.c
+arena.h  eternal  eternal.c  Makefile  orion  orion.c
 ```
 
----
-
-### Tahap 4 - Bersihkan IPC sebelum menjalankan server
+### Tahap 4 - Test error eternal tanpa orion
 
 ```bash
 make clear_ipc
-```
-
-Hasil yang diharapkan:
-
-```text
-IPC lama terhapus jika ada.
-```
-
-Catatan penting:
-
-```text
-make clear_ipc hanya dijalankan sebelum ./orion.
-Jangan jalankan make clear_ipc setelah orion menyala.
-```
-
----
-
-### Tahap 5 - Test error eternal tanpa orion
-
-Jangan jalankan `orion` dulu. Langsung jalankan:
-
-```bash
 ./eternal
 ```
 
@@ -2493,13 +2353,9 @@ Hasil yang diharapkan:
 Orion are you there?
 ```
 
-Penjelasan:
+Artinya client berhasil mendeteksi bahwa server `orion` belum berjalan.
 
-Output ini benar karena server `orion` belum aktif.
-
----
-
-### Tahap 6 - Jalankan orion
+### Tahap 5 - Jalankan orion
 
 Terminal 1:
 
@@ -2519,11 +2375,13 @@ PID: xxxx
 Waiting for Eternals...
 ```
 
-Biarkan terminal ini tetap menyala.
+Catatan penting:
 
----
+```text
+Jangan menjalankan make clear_ipc setelah orion menyala.
+```
 
-### Tahap 7 - Jalankan eternal
+### Tahap 6 - Jalankan eternal
 
 Terminal 2:
 
@@ -2543,9 +2401,7 @@ Hasil yang diharapkan:
 Choice:
 ```
 
----
-
-### Tahap 8 - Register akun
+### Tahap 7 - Register akun
 
 Input:
 
@@ -2561,11 +2417,9 @@ Hasil yang diharapkan:
 Account created! Default stats: Gold=150, Lvl=1, XP=0.
 ```
 
----
+### Tahap 8 - Test duplicate register
 
-### Tahap 9 - Test duplicate register
-
-Input ulang:
+Input:
 
 ```text
 1
@@ -2579,9 +2433,7 @@ Hasil yang diharapkan:
 Username 'rootkids' already registered.
 ```
 
----
-
-### Tahap 10 - Test login password salah
+### Tahap 9 - Test login password salah
 
 Input:
 
@@ -2597,9 +2449,7 @@ Hasil yang diharapkan:
 Login failed. Username or password is wrong.
 ```
 
----
-
-### Tahap 11 - Login benar
+### Tahap 10 - Login benar
 
 Input:
 
@@ -2615,7 +2465,7 @@ Hasil yang diharapkan:
 Welcome!
 ```
 
-Lalu muncul menu:
+Lalu muncul menu player:
 
 ```text
 +====================== ETERION ======================+
@@ -2630,9 +2480,7 @@ Lalu muncul menu:
 Choice:
 ```
 
----
-
-### Tahap 12 - Test profile
+### Tahap 11 - Test profile
 
 Input:
 
@@ -2652,9 +2500,7 @@ Damage : 10
 Weapon : None
 ```
 
----
-
-### Tahap 13 - Test armory
+### Tahap 12 - Test armory
 
 Input:
 
@@ -2672,21 +2518,9 @@ Demon Blade
 God Slayer
 ```
 
-Daftar weapon:
+### Tahap 13 - Test gold tidak cukup
 
-| No | Weapon | Cost | Bonus Damage |
-|---|---:|---:|---:|
-| 1 | Wood Sword | 100 | +5 |
-| 2 | Iron Sword | 300 | +15 |
-| 3 | Steel Axe | 600 | +30 |
-| 4 | Demon Blade | 1500 | +60 |
-| 5 | God Slayer | 5000 | +150 |
-
----
-
-### Tahap 14 - Test gold tidak cukup
-
-Pada menu armory pilih:
+Di armory pilih weapon mahal:
 
 ```text
 5
@@ -2698,11 +2532,9 @@ Hasil yang diharapkan:
 Not enough gold. Need 5000 G, you have 150 G.
 ```
 
----
+### Tahap 14 - Test beli weapon
 
-### Tahap 15 - Test beli Wood Sword
-
-Pada menu armory pilih:
+Di armory pilih:
 
 ```text
 1
@@ -2714,7 +2546,7 @@ Hasil yang diharapkan:
 Purchased Wood Sword. Best weapon now: Wood Sword.
 ```
 
-Profile setelah pembelian:
+Setelah itu profile berubah:
 
 ```text
 Gold   : 50
@@ -2722,11 +2554,9 @@ Damage : 15
 Weapon : Wood Sword
 ```
 
----
+### Tahap 15 - Test weapon sudah dimiliki
 
-### Tahap 16 - Test beli weapon yang sudah dimiliki
-
-Pilih lagi:
+Di armory pilih lagi:
 
 ```text
 1
@@ -2738,9 +2568,7 @@ Hasil yang diharapkan:
 You already own Wood Sword.
 ```
 
----
-
-### Tahap 17 - Test match history kosong
+### Tahap 16 - Test match history kosong
 
 Input:
 
@@ -2754,11 +2582,9 @@ Hasil yang diharapkan:
 No match history yet.
 ```
 
----
+### Tahap 17 - Test akun aktif di session lain
 
-### Tahap 18 - Test akun aktif di session lain
-
-Buka Terminal 3:
+Buka terminal client baru:
 
 ```bash
 cd ~/Modul3/soal2
@@ -2779,30 +2605,22 @@ Hasil yang diharapkan:
 This account is already active in another session.
 ```
 
----
+### Tahap 18 - Test battle melawan bot
 
-### Tahap 19 - Test battle melawan bot
-
-Pada akun `rootkids`, pilih:
+Di akun `rootkids`, pilih:
 
 ```text
 2
 ```
 
-Jika tidak ada lawan selama 35 detik, sistem membuat bot.
-
-Hasil yang diharapkan:
+Jika tidak ada player lain, tunggu sekitar 35 detik. Hasil yang diharapkan:
 
 ```text
 W1ld Beast
 [a] Attack | [u] Ultimate | [q] Give up
 ```
 
----
-
-### Tahap 20 - Test attack
-
-Saat battle, tekan:
+Tekan:
 
 ```text
 a
@@ -2814,41 +2632,25 @@ Hasil yang diharapkan:
 rootkids hits W1ld Beast for 15 damage!
 ```
 
----
-
-### Tahap 21 - Test ultimate
-
-Saat battle, tekan:
-
-```text
-u
-```
-
-Karena sudah punya Wood Sword, total damage adalah 15. Ultimate bernilai 3 kali total damage.
-
-Hasil yang diharapkan:
-
-```text
-rootkids ULTS W1ld Beast for 45 damage!
-```
-
----
-
-### Tahap 22 - Test cooldown attack
-
-Tekan `a` berulang dengan cepat.
-
-Hasil yang diharapkan:
+Tekan `a` berkali-kali dengan cepat. Hasil yang diharapkan:
 
 ```text
 Cooldown active. Wait 1 second(s).
 ```
 
----
+Tekan:
 
-### Tahap 23 - Test give up
+```text
+u
+```
 
-Saat battle, tekan:
+Hasil yang diharapkan jika sudah punya weapon:
+
+```text
+rootkids ULTS W1ld Beast for 45 damage!
+```
+
+Tekan:
 
 ```text
 q
@@ -2863,231 +2665,117 @@ Battle ended. Press ENTER to continue.
 
 ---
 
-### Tahap 24 - Test match history setelah battle
+## 4.5 Penjelasan Kode per Bagian
 
-Input:
+### 4.5.1 `arena.h`
 
-```text
-4
-```
-
-Hasil yang diharapkan:
-
-```text
-Time   | Opponent         | Result | XP
-```
-
----
-
-## 4.5 Test Cepat via Command Line
-
-Pastikan `orion` sudah menyala.
-
-```bash
-./eternal --register alice 12345
-./eternal --register alice 12345
-./eternal --login-profile alice wrong
-./eternal --login-profile alice 12345
-./eternal --buy alice 12345 5
-./eternal --buy alice 12345 1
-./eternal --buy alice 12345 1
-./eternal --history alice 12345
-```
-
-Hasil yang diharapkan:
-
-```text
-Account created! Default stats: Gold=150, Lvl=1, XP=0.
-Username 'alice' already registered.
-Login failed. Username or password is wrong.
-Not enough gold. Need 5000 G, you have 150 G.
-Purchased Wood Sword. Best weapon now: Wood Sword.
-You already own Wood Sword.
-```
-
----
-
-## 4.6 Ringkasan Error Handling Soal 2
-
-| Error Case | Cara Test | Hasil yang Diharapkan |
-|---|---|---|
-| Eternal tanpa Orion | `make clear_ipc`, lalu `./eternal` | `Orion are you there?` |
-| Register duplicate | Register username yang sama dua kali | Register ditolak |
-| Login password salah | Login dengan password salah | Login failed |
-| Akun aktif di terminal lain | Login akun sama di dua terminal | Login ditolak |
-| Gold tidak cukup | Beli God Slayer saat gold 150 | Pembelian ditolak |
-| Weapon sudah dimiliki | Beli Wood Sword dua kali | Pembelian ditolak |
-| Ultimate tanpa weapon | Akun baru battle lalu tekan `u` | Ultimate ditolak |
-| Attack spam | Tekan `a` cepat berulang | Cooldown aktif |
-| Tidak ada lawan | Masuk battle sendirian | Bot muncul setelah 35 detik |
-| IPC rusak karena salah reset | `make clear_ipc` setelah orion nyala | Restart orion dan clear IPC dari awal |
-
----
-
-## 4.7 Penjelasan Kode per Bagian Soal 2
-
-### `arena.h`
-
-File ini berisi konfigurasi utama game.
+`arena.h` berisi konfigurasi utama game, seperti key IPC, command request, response code, struktur user, struktur battle, dan daftar weapon.
 
 Bagian penting:
 
-```c
-#define MSG_KEY 0x0001234
-#define SHM_KEY 0x0005678
-#define MAX_USERS 64
-#define MAX_BATTLES 32
-#define BASE_DAMAGE 10
-#define BASE_HEALTH 100
-#define MATCH_TIMEOUT 35
-```
-
-`MSG_KEY` digunakan untuk Message Queue, sedangkan `SHM_KEY` digunakan untuk Shared Memory.
-
-Struct penting:
-
-| Struct | Fungsi |
+| Bagian | Fungsi |
 |---|---|
-| `Weapon` | Menyimpan nama weapon, harga, dan bonus damage |
-| `MatchHistory` | Menyimpan riwayat battle |
-| `User` | Menyimpan data player |
-| `Battle` | Menyimpan data battle aktif |
-| `Arena` | Data utama yang berada di Shared Memory |
-| `Request` | Pesan request dari client ke server |
-| `Response` | Pesan response dari server ke client |
+| `MSG_KEY` | Key Message Queue |
+| `SHM_KEY` | Key Shared Memory |
+| `CMD_REGISTER` sampai `CMD_SHUTDOWN` | Jenis request client |
+| `RSP_OK`, `RSP_ERR`, `RSP_WAITING`, `RSP_BATTLE`, `RSP_ENDED` | Status response server |
+| `Weapon` | Data weapon |
+| `User` | Data player |
+| `Battle` | Data pertandingan |
+| `Arena` | Data utama pada Shared Memory |
+| `Request` | Pesan dari client ke server |
+| `Response` | Balasan dari server ke client |
 
----
+### 4.5.2 `orion.c`
 
-### `Makefile`
+`orion.c` adalah server utama game. Server membuat IPC, memproses request, mengatur user, mengatur matchmaking, menjalankan battle, memberi reward, dan menyimpan data player.
 
-Makefile digunakan agar compile dan cleanup lebih mudah.
+Fungsi penting:
+
+| Fungsi | Penjelasan |
+|---|---|
+| `init_ipc()` | Membuat Message Queue dan Shared Memory |
+| `cleanup()` | Membersihkan IPC saat server berhenti |
+| `save_users()` | Menyimpan data player ke file |
+| `load_users()` | Memuat data player dari file |
+| `find_user()` | Mencari user berdasarkan username |
+| `find_user_by_pid()` | Mencari user berdasarkan PID client |
+| `total_damage()` | Menghitung damage total |
+| `max_health()` | Menghitung health maksimal |
+| `format_profile()` | Membuat tampilan profile |
+| `format_armory()` | Membuat tampilan armory |
+| `format_history()` | Membuat tampilan history |
+| `start_battle()` | Membuat battle baru |
+| `handle_enter_battle()` | Mengatur matchmaking |
+| `handle_battle_status()` | Mengirim status battle terbaru |
+| `handle_attack()` | Memproses attack dan ultimate |
+| `maybe_bot_attack()` | Membuat bot menyerang otomatis |
+| `finish_battle()` | Menyelesaikan battle |
+| `apply_rewards()` | Memberikan XP dan gold |
+| `handle_forfeit()` | Memproses surrender |
+| `handle_request()` | Pusat pemrosesan semua request |
+
+Server menggunakan mutex pada Shared Memory agar data tetap aman saat diakses banyak process.
+
+### 4.5.3 `eternal.c`
+
+`eternal.c` adalah client player. Client menampilkan menu, membaca input, mengirim request ke server, menerima response, dan menampilkan hasilnya ke terminal.
+
+Fungsi penting:
+
+| Fungsi | Penjelasan |
+|---|---|
+| `connect_ipc()` | Mengecek apakah Orion aktif |
+| `send_req()` | Mengirim request dan menerima response |
+| `print_main_gate()` | Menampilkan menu awal |
+| `print_player_menu()` | Menampilkan menu player |
+| `do_register()` | Register akun |
+| `do_login()` | Login akun |
+| `do_logout()` | Logout akun |
+| `armory_menu()` | Menampilkan dan memproses pembelian weapon |
+| `battle_mode()` | Menjalankan battle realtime |
+| `enable_raw()` | Mengubah terminal agar membaca input per karakter |
+| `disable_raw()` | Mengembalikan mode terminal |
+| `render_battle()` | Menampilkan arena battle |
+| `batch_mode()` | Mode test cepat via command line |
+
+### 4.5.4 `Makefile`
+
+`Makefile` mempermudah compile dan cleanup.
 
 Target penting:
 
 | Target | Fungsi |
 |---|---|
 | `all` | Compile server dan client |
-| `server` | Membuat binary `orion` |
-| `client` | Membuat binary `eternal` |
-| `clean` | Menghapus binary hasil compile |
-| `clear_ipc` | Menghapus Message Queue dan Shared Memory lama |
-
----
-
-### `eternal.c`
-
-`eternal.c` adalah client player.
-
-Fungsi penting:
-
-| Fungsi | Penjelasan |
-|---|---|
-| `connect_ipc()` | Mengecek apakah `orion` aktif dan IPC tersedia |
-| `send_req()` | Mengirim request ke server dan menunggu response |
-| `print_main_gate()` | Menampilkan menu awal |
-| `print_player_menu()` | Menampilkan menu setelah login |
-| `do_register()` | Register akun baru |
-| `do_login()` | Login akun |
-| `do_logout()` | Logout akun |
-| `armory_menu()` | Menampilkan armory dan membeli weapon |
-| `battle_mode()` | Menjalankan battle realtime |
-| `enable_raw()` | Membuat terminal membaca input per karakter saat battle |
-| `disable_raw()` | Mengembalikan terminal ke mode normal |
-| `batch_mode()` | Mode test cepat lewat command line |
-
-Pada `connect_ipc()`, client tidak hanya mengecek Message Queue, tetapi juga mengecek Shared Memory dan PID `orion`. Jika server tidak aktif, client menampilkan:
-
-```text
-Orion are you there?
-```
-
----
-
-### `orion.c`
-
-`orion.c` adalah server utama.
-
-Fungsi penting:
-
-| Fungsi | Penjelasan |
-|---|---|
-| `init_ipc()` | Membuat Message Queue, Shared Memory, dan mutex |
-| `save_users()` | Menyimpan data player ke `data/players.db` |
-| `load_users()` | Memuat data player dari file |
-| `find_user()` | Mencari user berdasarkan username |
-| `find_user_by_pid()` | Mencari user berdasarkan PID client |
-| `pid_alive()` | Mengecek apakah proses client/server masih hidup |
-| `best_weapon_damage()` | Mengambil bonus damage terbesar dari weapon player |
-| `best_weapon_name()` | Mengambil nama weapon terbaik player |
-| `total_damage()` | Menghitung damage total player |
-| `max_health()` | Menghitung health maksimum player |
-| `recalc_level()` | Menghitung level berdasarkan XP |
-| `format_profile()` | Membuat tampilan profile |
-| `format_armory()` | Membuat tampilan armory |
-| `format_history()` | Membuat tampilan history |
-| `start_battle()` | Membuat battle baru |
-| `handle_enter_battle()` | Mengatur matchmaking |
-| `handle_battle_status()` | Mengirim status battle ke client |
-| `handle_attack()` | Memproses attack dan ultimate |
-| `maybe_bot_attack()` | Menjalankan serangan bot otomatis |
-| `finish_battle()` | Menyelesaikan battle |
-| `apply_rewards()` | Memberikan reward XP dan gold |
-| `handle_forfeit()` | Memproses player menyerah |
-| `handle_request()` | Pusat pemrosesan semua request |
-
-Rumus damage:
-
-```text
-BASE_DAMAGE + total_xp / 50 + bonus_weapon
-```
-
-Rumus health:
-
-```text
-BASE_HEALTH + total_xp / 10
-```
-
-Rumus level:
-
-```text
-1 + total_xp / 100
-```
-
-Reward menang:
-
-```text
-XP   +50
-Gold +120
-```
-
-Reward kalah:
-
-```text
-XP   +15
-Gold +30
-```
-
-Mutex digunakan saat server membaca atau mengubah data di Shared Memory agar tidak terjadi race condition.
+| `server` | Compile `orion.c` menjadi `orion` |
+| `client` | Compile `eternal.c` menjadi `eternal` |
+| `clean` | Menghapus executable hasil compile |
+| `clear_ipc` | Menghapus IPC sisa run sebelumnya |
 
 ---
 
 # 5. Bersihkan Sebelum Submit
 
-Jangan submit binary, file log, atau data runtime.
+Sebelum zip atau push, jalankan:
 
 ```bash
 cd ~/Modul3/soal1
-rm -f navi wired *.o history.log
+rm -f wired navi *.o history.log
 
 cd ~/Modul3/soal2
-make clean
+make clean 2>/dev/null
 rm -rf data
+```
 
+Cek struktur akhir:
+
+```bash
 cd ~/Modul3
 tree
 ```
 
-Struktur akhir yang diharapkan:
+Hasil yang diharapkan:
 
 ```text
 .
@@ -3095,7 +2783,6 @@ Struktur akhir yang diharapkan:
 ├── soal1
 │   ├── navi.c
 │   ├── protocol.c
-│   ├── protocol.h
 │   └── wired.c
 └── soal2
     ├── arena.h
@@ -3104,25 +2791,36 @@ Struktur akhir yang diharapkan:
     └── orion.c
 ```
 
----
-
-# 6. Push ke GitHub
+Buat ZIP untuk pengumpulan:
 
 ```bash
-cd ~/Modul3
-git add .
-git commit -m "docs: add complete module 3 report"
-git push
+cd ~
+rm -rf SISOP-3-2026-IT-124
+cp -r Modul3 SISOP-3-2026-IT-124
+zip -r SISOP-3-2026-IT-124.zip SISOP-3-2026-IT-124
+```
+
+Pastikan ZIP tidak berisi file runtime:
+
+```text
+wired
+navi
+orion
+eternal
+*.o
+history.log
+data/
+players.db
 ```
 
 ---
 
-# 7. Kesimpulan
+# 6. Kesimpulan
 
-Pada modul ini, dua sistem dibuat untuk memahami konsep komunikasi antarproses dan sinkronisasi.
+Pada Modul 3 ini, saya mengimplementasikan dua program yang berhubungan dengan konsep Sistem Operasi.
 
-Soal 1 menggunakan socket TCP dan pthread untuk membangun sistem client-server. Server mampu menangani banyak client, mencegah username duplicate, menyediakan fitur admin, serta mencatat aktivitas ke file log.
+Soal 1 menggunakan socket TCP dan pthread untuk membuat sistem client-server. Program ini memiliki fitur multi-client, broadcast chat, admin console, emergency shutdown, dan log aktivitas.
 
-Soal 2 menggunakan System V IPC berupa Message Queue dan Shared Memory. Program dibuat sebagai game terminal dengan fitur register, login, profile, armory, battle realtime, matchmaking, bot fallback, reward, history, dan error handling.
+Soal 2 menggunakan IPC berupa Message Queue, Shared Memory, dan mutex untuk membuat game battle realtime. Program ini memiliki fitur register, login, profile, armory, matchmaking, battle melawan player atau bot, reward, dan match history.
 
-Dari pengerjaan modul ini, konsep yang paling penting adalah bagaimana beberapa proses atau thread dapat berkomunikasi dengan aman, bagaimana data bersama harus dilindungi dengan mutex, dan bagaimana program harus menangani kondisi error agar tetap stabil saat diuji.
+Melalui pengerjaan modul ini, saya memahami cara process berkomunikasi, cara server menangani banyak client, cara mengatur data bersama, dan cara mencegah race condition menggunakan mutex.
