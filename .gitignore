@@ -1,0 +1,11 @@
+soal1/navi
+soal1/wired
+soal1/*.o
+soal1/history.log
+
+soal2/orion
+soal2/eternal
+soal2/*.o
+soal2/data/
+
+*.zip
