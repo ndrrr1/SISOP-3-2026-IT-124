@@ -2755,7 +2755,7 @@ Target penting:
 
 ---
 
-# 6. Kesimpulan
+# 5. Kesimpulan
 
 Pada Modul 3 ini, saya mengimplementasikan dua program yang berhubungan dengan konsep Sistem Operasi.
 
